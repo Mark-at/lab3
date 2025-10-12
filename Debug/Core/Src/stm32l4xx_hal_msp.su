@@ -6,4 +6,4 @@
 ../Core/Src/stm32l4xx_hal_msp.c:298:6:HAL_DFSDM_FilterMspDeInit	16	static
 ../Core/Src/stm32l4xx_hal_msp.c:331:6:HAL_DFSDM_ChannelMspDeInit	16	static
 ../Core/Src/stm32l4xx_hal_msp.c:361:6:HAL_TIM_Base_MspInit	24	static
-../Core/Src/stm32l4xx_hal_msp.c:386:6:HAL_TIM_Base_MspDeInit	16	static
+../Core/Src/stm32l4xx_hal_msp.c:400:6:HAL_TIM_Base_MspDeInit	16	static

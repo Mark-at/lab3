@@ -49,6 +49,7 @@ DFSDM_Channel_HandleTypeDef hdfsdm1_channel2;
 DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
 uint16_t  sin_Value = 0;
@@ -66,6 +67,7 @@ static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_DAC1_Init(void);
 static void MX_DFSDM1_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -78,7 +80,8 @@ static void MX_DFSDM1_Init(void);
 }*/
 void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin) {
 	//toggle pin
-	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	 HAL_TIM_Base_Start_IT(&htim3);
 	 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
 
 	HAL_DFSDM_FilterRegularStart_DMA (
@@ -87,6 +90,8 @@ void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin) {
 
 void HAL_DFSDM_FilterRegConvCpltCallback (DFSDM_Filter_HandleTypeDef * hdfsdm_filter){
 	HAL_DFSDM_FilterRegularStop_DMA(&hdfsdm1_filter0);
+	HAL_TIM_Base_Stop_IT(&htim3); //stop blinking
+	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 	for (int i=0; i< 40000; i++) {
 		//soundArrayPro[i] = (uint16_t)((soundArray[i] >> 20) + 2048);
 		int32_t sample = soundArray[i] >> 8;
@@ -98,11 +103,12 @@ void HAL_DFSDM_FilterRegConvCpltCallback (DFSDM_Filter_HandleTypeDef * hdfsdm_fi
 		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)soundArrayPro, 40000, DAC_ALIGN_12B_R);
 }
 
-/*void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim) {
-	i=(i+1)%500;
-	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, sin_Array[i]);
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim) {
+//	i=(i+1)%500;
+//	HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, sin_Array[i]);
+		if (htim == &htim3) HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 
-}*/
+}
 
 
 /* USER CODE END 0 */
@@ -156,6 +162,7 @@ int main(void)
   MX_TIM2_Init();
   MX_DAC1_Init();
   MX_DFSDM1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   //HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
 //  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)sin_Array, 500, DAC_ALIGN_12B_R);
@@ -366,6 +373,51 @@ static void MX_TIM2_Init(void)
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 500;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 60000;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
 
 }
 
