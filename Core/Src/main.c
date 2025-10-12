@@ -54,10 +54,12 @@ TIM_HandleTypeDef htim3;
 /* USER CODE BEGIN PV */
 uint16_t  sin_Value = 0;
 uint16_t sin_Array[500];
+uint16_t c[19], d[17], e[15], f[14], g[12], a[11];
 uint16_t i = 0;
 uint32_t soundArray[40000];
 uint16_t soundArrayPro[40000];
 uint8_t startPlayBack=0;
+int l=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -81,6 +83,7 @@ static void MX_TIM3_Init(void);
 void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin) {
 	//toggle pin
 	//HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	l=0;
 	 HAL_TIM_Base_Start_IT(&htim3);
 	 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
 
@@ -100,7 +103,8 @@ void HAL_DFSDM_FilterRegConvCpltCallback (DFSDM_Filter_HandleTypeDef * hdfsdm_fi
 		if (sample > 4095) sample = 4095;
 		soundArrayPro[i] = (uint16_t)sample;
 	}
-		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)soundArrayPro, 40000, DAC_ALIGN_12B_R);
+		 // HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)soundArrayPro, 40000, DAC_ALIGN_12B_R);
+	l = 1;
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim) {
@@ -126,17 +130,31 @@ int main(void)
 //
 //		  sin_Value += 4;
 //	}  //at the end, we have the array
-//	for (int i = 0; i < 956; i ++) {
-//			  sin_Array[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 3824.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
-//
-//			  sin_Value += 4;
-//		}  //at the end, we have the array
-//	for (int i = 0; i < 852; i ++) {
-//				  sin_Array[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 3408.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
-//
-//				  sin_Value += 4;
-//			}
+	for (int i = 0; i < 19; i ++) {
+			  c[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 76.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
 
+			  sin_Value += 4;
+	}  //at the end, we have the array
+	for (int i = 0; i < 17; i ++) {
+				  d[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 68.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
+				  sin_Value += 4;
+	}
+	for (int i = 0; i < 15; i ++) {
+			  e[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 60.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
+			  sin_Value += 4;
+	}  //at the end, we have the array
+	for (int i = 0; i < 14; i ++) {
+				  f[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 56.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
+				  sin_Value += 4;
+	}
+	for (int i = 0; i < 12; i ++) {
+			  g[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 48.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
+			  sin_Value += 4;
+	}  //at the end, we have the array
+	for (int i = 0; i < 11; i ++) {
+			  a[i] = (uint16_t) ( (arm_sin_f32( (float)sin_Value / 44.0f * 2.0f * PI ) + 1.0f) * 2000.0f );
+			  sin_Value += 4;
+	}
 
   /* USER CODE END 1 */
 
@@ -179,7 +197,38 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  	  			//play
+	  if (l == 1) {
 
+	 		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)soundArrayPro, 40000, DAC_ALIGN_12B_R);
+HAL_Delay(2000);
+HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+if (l==0) continue;
+HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)c, 19, DAC_ALIGN_12B_R);
+	 		  HAL_Delay(1000);
+	 		 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+	 		if (l==0) continue;
+	 		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)d, 17, DAC_ALIGN_12B_R);
+	 		  HAL_Delay(1000);
+	 		 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+	 		if (l==0) continue;
+	 		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)e, 15, DAC_ALIGN_12B_R);
+	 		  HAL_Delay(1000);
+	 		 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+	 		if (l==0) continue;
+	 		HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)f, 14, DAC_ALIGN_12B_R);
+	 			 		  HAL_Delay(1000);
+	 			 		 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+	 			 		if (l==0) continue;
+	 			 		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)g, 12, DAC_ALIGN_12B_R);
+	 			 		  HAL_Delay(1000);
+	 			 		 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+	 			 		if (l==0) continue;
+	 			 		  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)a, 11, DAC_ALIGN_12B_R);
+	 			 		  HAL_Delay(1000);
+	 			 		 HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1);
+
+
+	 	  }
   }
   /* USER CODE END 3 */
 }
